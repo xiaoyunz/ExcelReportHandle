@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reports>
+	<!-- 功能说明：允许同一报表写入多个sheet，允许同一sheet写入多个数据块-->
+	<!-- name：报表标识（全局唯一），filename：保存报表的文件名，允许配置多个参数。p{1}：表示第一个占位参数，默认从1开始，在程序中须按顺序加入参数list列表 -->
+	<report name="部门月度销售统计" filename="部门月度销售统计_p{1}">
+		<!-- 模板名称，非必须，若使用模板才需要配置。template：模板名称 -->
+		<template>部门月度销售统计_yyyyMMdd.xlsx</template>
+		<!-- 允许sheet配置多个，index：sheet序号，不允许重复。name：sheet名称，允许传入参数 -->
+		<sheet index="0" name="月度销售报表明细p{1}" >
+			<!-- 允许同一sheet写入多个数据块（建议可预见数据行数使用，否则可能覆盖数据行），以行分隔，表头默认以cloumn中name为写入一行。 -->
+			<!-- index：数据块标识，datakey：表示数据块map的key，默认从0开始 -->
+			<!-- swrite：表示写入开始行，对应excel行号，下标从0开始 -->
+			<row index="1" swrite="2" datakey="0">
+				<!-- 配置sheet column，formatter：列数据格式化，name：列名，field：反射获取实体字段数据，index：列序号，默认从0开始 -->
+				<column formatter="" name="序号" field="s_no" index="0"></column>
+				<column formatter="" name="姓名" field="name" index="1"></column>
+				<column formatter="" name="部门" field="dep_no" index="2"></column>
+				<column formatter="#,##0.00" name="销售金额" field="sales_amount" index="3"></column>
+				<column formatter="" name="销售日期" field="sales_date" index="4"></column>
+			</row>
+		</sheet>
+		<sheet index="1" name="月度销售报表汇总p{1}">
+			<row index="1" swrite="3" datakey="1">
+				<column formatter="" name="部门" field="dep_no" index="0"></column>
+				<column formatter="#,##0.00" name="总销售金额" field="sales_amount_total" index="1"></column>
+				<column formatter="#,##0.00" name="完成率" field="complete_rate" index="2"></column>
+				<column formatter="#,##0.00" name="排名" field="ranking" index="3"></column>
+			</row>
+			<row index="2" swrite="3" datakey="1">
+				<column formatter="" name="姓名" field="name" index="5"></column>
+				<column formatter="" name="部门" field="dep_no" index="6"></column>
+				<column formatter="#,##0.00" name="总销售金额" field="sales_amount_total" index="7"></column>
+				<column formatter="#,##0.00" name="完成率" field="complete_rate" index="8"></column>
+				<column formatter="#,##0.00" name="排名" field="ranking" index="9"></column>
+			</row>
+			<row index="3" swrite="3" datakey="2">
+				<column formatter="" name="姓名" field="name" index="11"></column>
+				<column formatter="#,##0.00" name="基本工资" field="basic_salary" index="12"></column>
+				<column formatter="#,##0.00" name="提成工资" field="sales_salary" index="13"></column>
+				<column formatter="#,##0.00" name="奖金" field="bonus_salary" index="14"></column>
+				<column formatter="#,##0.00" name="总计" field="salary_total" index="15"></column>
+			</row>
+		</sheet>
+	</report>
+	
+</reports>
