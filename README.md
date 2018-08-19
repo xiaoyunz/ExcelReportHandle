@@ -6,16 +6,18 @@
 
 二、配置文件示例及详细说明
 
-    1、导入xml配置示例如下（见src/main/resources/import-config.xml）：
+    1、导入xml配置示例如下（见src/main/resources/import-config.xml）
 
-    2、导出xml配置示例如下（见src/main/resources/export-config.xml）：
+    2、导出xml配置示例如下（见src/main/resources/export-config.xml）
 
 三、调用示例
-
-   1、导入：src/test/java/com/reports/test/ExcelImportReportTest 
+         
+    1、导入：src/test/java/com/reports/test/ExcelImportReportTest 
    
-   2、导出：src/test/java/com/reports/test/ExcelExportReportTest 
+    2、导出：src/test/java/com/reports/test/ExcelExportReportTest 
 
-四、测试用例及数据路径src/test/resources/
+四、测试用例及数据
+
+    路径src/test/resources/
 
 
