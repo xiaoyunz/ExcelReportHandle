@@ -12,9 +12,9 @@
 
 三、调用示例
          
-    1、导入：src/test/java/com/reports/test/ExcelImportReportTest 
+    1、导入：src/test/java/com/reports/test/ExcelImportReportTest.java 
    
-    2、导出：src/test/java/com/reports/test/ExcelExportReportTest 
+    2、导出：src/test/java/com/reports/test/ExcelExportReportTest.java 
 
 四、测试用例及数据
 
