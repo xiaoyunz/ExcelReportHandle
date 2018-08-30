@@ -49,6 +49,8 @@ public class ExcelImportReader implements ImportReader {
 				sheet = workbook.getSheetAt(sheetIndex);
 				int lastRowNum = sheet.getLastRowNum();
 				logger.info("----------数据总行数----------    sheet：" + sName + "总行数：" + lastRowNum);
+				//读取sheet中所有的合并单元格
+				Map<String, String> camap = ImportUtil.getMergedRegion(sheet);
 				ArrayList<Rowx> rows = ImportUtil.getRows(sheetx);
 				for (Rowx rowx : rows) {
 					int rowIndex = rowx.getIndex();
@@ -57,20 +59,20 @@ public class ExcelImportReader implements ImportReader {
 					int endRow = rowx.getEread() >= 1 ? rowx.getEread() : lastRowNum;
 					logger.info("----------读取数据块----------   sheet index：" + sheetIndex + "  row index：" + rowIndex + "  sread：" + startRow + "  eread："
 							+ endRow);
+					JSONObject jsonObject = null;
 					for (int i = startRow; i <= endRow; i++) {
 						row = sheet.getRow(i);
-						JSONObject jsonObject = new JSONObject();
+						jsonObject = new JSONObject();
 						ArrayList<Columnx> columns = ImportUtil.getColumns(rowx);
 						for (Columnx column : columns) {
 							String value;
-							boolean isMerge = ImportUtil.isMergedRegion(sheet, i, column.getIndex());
-							if (isMerge) {
-								value = ImportUtil.getMergedRegionValue(sheet, column.getType(), i, column.getIndex());
+							String regin = "" + i + column.getIndex();
+							if (camap.containsKey(regin)) {
+								value = ImportUtil.getMergedRegionValue2(sheet, column.getType(), i, column.getIndex(), camap);
 							} else {
 								cell = row.getCell(column.getIndex());
 								value = ImportUtil.getCellValue(column.getType(), cell);
 							}
-							
 							// 校验读取的数据是否符合要求,若不符合，记录错误信息
 							String error = ImportUtil.checkCellValue(sName, i + 1, column, value);
 							errors.append(error);
@@ -79,9 +81,11 @@ public class ExcelImportReader implements ImportReader {
 							value = StringUtils.isNotBlank(value) ? value.trim() : "";
 							// json格式存放字段数据
 							jsonObject.put(column.getField(), value);
+							
 						}
 						//获取excel行号
 						jsonObject.put("excel_row_num", row.getRowNum());
+						System.out.println("----------"+jsonObject);
 						//把一行数据添加到json中
 						jsonArray.add(jsonObject);
 					}
@@ -102,9 +106,16 @@ public class ExcelImportReader implements ImportReader {
 			return resultData;
 		} finally {
 			try {
-				// 关闭流
-				workbook.close();
-				is.close();
+				if (null != workbook) {
+					// 关闭流
+					workbook.close();
+					workbook = null;
+				}
+				if (null != is) {
+					// 关闭流
+					is.close();
+					is = null;
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

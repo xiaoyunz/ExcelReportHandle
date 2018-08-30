@@ -6,6 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -15,6 +18,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.reports.imports.xmlhandle.Columnx;
 import com.reports.imports.xmlhandle.Import;
 import com.reports.imports.xmlhandle.Rowx;
@@ -126,11 +130,11 @@ public class ImportUtil {
 			} else {
 				if ("sdate".equalsIgnoreCase(type) || "ldate".equalsIgnoreCase(type) || "time".equalsIgnoreCase(type)) {
 					if (null != cell.getStringCellValue() && cell.getStringCellValue().trim().length() != 0) {
-						if ("sdate".equalsIgnoreCase(type)) {  //短日期类型
+						if ("sdate".equalsIgnoreCase(type)) { // 短日期类型
 							try {
 								Date date = cell.getDateCellValue();
 								value = DateFormatUtils.format(date, "yyyyMMdd");
-							} catch(Exception e) {
+							} catch (Exception e) {
 								SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 								SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMdd");
 								try {
@@ -140,11 +144,11 @@ public class ImportUtil {
 									e1.printStackTrace();
 								}
 							}
-						} else if ("ldate".equalsIgnoreCase(type)) {    //长日期类型
+						} else if ("ldate".equalsIgnoreCase(type)) { // 长日期类型
 							try {
 								Date date = cell.getDateCellValue();
 								value = DateFormatUtils.format(date, "yyyyMMddHHmmss");
-							} catch(Exception e) {
+							} catch (Exception e) {
 								SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 								SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMddHHmmss");
 								try {
@@ -154,11 +158,11 @@ public class ImportUtil {
 									e1.printStackTrace();
 								}
 							}
-						} else if ("time".equalsIgnoreCase(type)) {     //短时间类型
+						} else if ("time".equalsIgnoreCase(type)) { // 短时间类型
 							try {
 								Date date = cell.getDateCellValue();
 								value = DateFormatUtils.format(date, "HHmmss");
-							} catch(Exception e) {
+							} catch (Exception e) {
 								SimpleDateFormat format1 = new SimpleDateFormat("HH:mm:ss");
 								SimpleDateFormat format2 = new SimpleDateFormat("HHmmss");
 								try {
@@ -196,7 +200,7 @@ public class ImportUtil {
 	}
 
 	/**
-	 * 获取合并单元格的值
+	 * 获取合并单元格的值(废弃)
 	 * 
 	 * @param sheet
 	 * @param row
@@ -220,6 +224,56 @@ public class ImportUtil {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * 读取sheet中所有的合并单元格
+	 * 
+	 * @param sheet
+	 * @return
+	 */
+	public static Map<String, String> getMergedRegion(Sheet sheet) {
+		Map<String, String> map = new HashMap<String, String>();
+		// 遍历合并区域
+		for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+			CellRangeAddress ca = sheet.getMergedRegion(i);
+			int firstColumn = ca.getFirstColumn();
+			int lastColumn = ca.getLastColumn();
+			int firstRow = ca.getFirstRow();
+			int lastRow = ca.getLastRow();
+			for (int x = firstRow; x <= lastRow; x++) {
+				for (int z = firstColumn; z <= lastColumn; z++) {
+					map.put("" + x + z, firstRow + "-" + lastRow + "#" + firstColumn + "-"+ lastColumn);
+				}
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * 读取合并单元格的值
+	 * @param sheet
+	 * @param type
+	 * @param row
+	 * @param column
+	 * @param mergedRegionMap
+	 * @return
+	 */
+	public static String getMergedRegionValue2(Sheet sheet, String type, int row, int column,
+			Map<String, String> mergedRegionMap) {
+		String regin = mergedRegionMap.get(""+row+column);
+		int firstRow = Integer.parseInt(regin.split("#")[0].split("-")[0]);
+		int lastRow = Integer.parseInt(regin.split("#")[0].split("-")[1]);
+		int firstColumn = Integer.parseInt(regin.split("#")[1].split("-")[0]);
+		int lastColumn = Integer.parseInt(regin.split("#")[1].split("-")[1]);
+		if (row >= firstRow && row <= lastRow) {
+			if (column >= firstColumn && column <= lastColumn) {
+				Row Row = sheet.getRow(firstRow);
+				Cell fCell = Row.getCell(firstColumn);
+				return getCellValue(type, fCell);
+			}
+		}
+		return "";
 	}
 
 	/**
@@ -314,7 +368,7 @@ public class ImportUtil {
 					return error;
 				}
 			} else if ("sdate".equalsIgnoreCase(column.getType())) { // 检查sdate类型
-				//短日期类型，必须是8位
+				// 短日期类型，必须是8位
 				if (cellvalue.trim().length() != 8) {
 					error = formatString(sheetname, row, cell, Constants.IMPORT_ERRORS_CHECK_TYPE_SDATE);
 					logger.error("转换short date类型错误" + error);
@@ -331,7 +385,7 @@ public class ImportUtil {
 					}
 				}
 			} else if ("ldate".equalsIgnoreCase(column.getType())) { // 检查ldate类型
-				//长日期类型，必须是14位
+				// 长日期类型，必须是14位
 				if (cellvalue.trim().length() != 14) {
 					error = formatString(sheetname, row, cell, Constants.IMPORT_ERRORS_CHECK_TYPE_LDATE);
 					logger.error("转换Long date类型错误" + error);
@@ -348,7 +402,7 @@ public class ImportUtil {
 					}
 				}
 			} else if ("time".equalsIgnoreCase(column.getType())) { // 检查time类型
-				//时间类型，必须是6位
+				// 时间类型，必须是6位
 				if (cellvalue.trim().length() != 6) {
 					error = formatString(sheetname, row, cell, Constants.IMPORT_ERRORS_CHECK_TYPE_TIME);
 					logger.error("转换short time类型错误" + error);
@@ -379,7 +433,8 @@ public class ImportUtil {
 	 * @return
 	 */
 	public static String formatString(String sheetname, int row, int cell, String errorinfo) {
-		return String.format("sheet: %s 行：%s 列：%s %s %s", sheetname, row, cell, errorinfo, Constants.IMPORT_ERRORS_CHECK_SEPARATOR);
+		return String.format("sheet: %s 行：%s 列：%s %s %s", sheetname, row, cell, errorinfo,
+				Constants.IMPORT_ERRORS_CHECK_SEPARATOR);
 	}
 
 }
