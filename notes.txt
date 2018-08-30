@@ -2,3 +2,6 @@
 1、apache-tomcat-8.5 +
 2、jdk 1.8 +
 3、Maven 3.2 +
+
+POI读写大数据量excel，解决超过几万行而导致内存溢出的问题
+参考：https://www.cnblogs.com/swordfall/p/8298386.html
