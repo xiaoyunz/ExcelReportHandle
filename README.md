@@ -1,4 +1,5 @@
 概述：Java poi导入导出EXCEL工具类（兼容各版本）,支持用户模式和SAX事件驱动模式。
+![Image text](https://raw.githubusercontent.com/xiaoyunz/ExcelReportHandle/master/img-folder/poi.png)
             
     POI读取Excel有两种模式，一种是用户模式，一种是SAX事件驱动模式，将xlsx格式的文档转换成CSV格式后进行读取。
 
