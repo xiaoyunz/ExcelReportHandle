@@ -128,18 +128,22 @@ public class XlsxReportMaker implements IReportMaker {
 							}
 							// 通过反射获取字段数据
 							cellVal = ExportUtil.getFieldValueByName(column.getField(), rowData.get(i));
-							if (cellVal instanceof BigDecimal) {
-								cell.setCellValue(((BigDecimal) cellVal).doubleValue());
-							} else if (cellVal instanceof Double) {
-								cell.setCellValue(Double.parseDouble(cellVal.toString()));
+							if (null == cellVal) {
+								cell.setCellValue("");
 							} else {
-								cell.setCellValue(cellVal.toString());
-							}
-							// 数据格式化
-							if (StringUtils.isNotBlank(column.getFormatter())) {
-								cellStyle = workbook.createCellStyle();
-								cellStyle.setDataFormat(format.getFormat(column.getFormatter()));
-								cell.setCellStyle(cellStyle);
+								if (cellVal instanceof BigDecimal) {
+									cell.setCellValue(((BigDecimal) cellVal).doubleValue());
+								} else if (cellVal instanceof Double) {
+									cell.setCellValue(Double.parseDouble(cellVal.toString()));
+								} else {
+									cell.setCellValue(cellVal.toString());
+								}
+								// 数据格式化
+								if (StringUtils.isNotBlank(column.getFormatter())) {
+									cellStyle = workbook.createCellStyle();
+									cellStyle.setDataFormat(format.getFormat(column.getFormatter()));
+									cell.setCellStyle(cellStyle);
+								}
 							}
 						}
 					}
